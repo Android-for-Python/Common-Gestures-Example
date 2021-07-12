@@ -1,7 +1,7 @@
 Common Gestures Example
 =======================
 
-*Gestures in place of (and using) the Kivy touch api*
+*Use a Gestures api in place of (and depending on) the Kivy touch api*
 
 ## Behavior
 
@@ -11,24 +11,24 @@ Designed for use on Android, the gestures can be used on any Kivy supported plat
 
 These gestures can be **added** to Kivy widgets by subclassing a Kivy Widget and `CommonGestures`, and then including the methods for the required gestures. For a minimal example see `SwipeScreen` below.
 
-`CommonGestures` methods detect gestures, they do not define behaviors.
+`CommonGestures` callback methods detect gestures, they do not define behaviors.
 
 ## Examples
 
 Run the example `main.py` it has five screens. It may be run on any OS.
 
-The first screen demonstrates a Screen that responds to a swipe. To implement we create a new class `SwipeScreen` inheriting from `Screen`. The `SwipeScreen` class is then added to the screen manager in the usual way.
+The first screen demonstrates a Screen that responds to a swipe. To implement we create a new class `SwipeScreen` inheriting from `Screen`. Acallback is added for each gesture we choose to recognize:
+
 ```
 ### A swipe sensitive Screen
 class SwipeScreen(Screen, CommonGestures):
-    # Gesture recognized
-    ################################################
+
     def cg_swipe_horizontal(self, touch, right):
         # here we add the user defined behavior for the gesture
 	# this method controls the ScreenManager 
         App.get_running_app().swipe_screen(right)
 ```
-Controling the behavior of the screen manager from the `cg_swipe_horizontal()` callback is shown in [main.py](https://github.com/Android-for-Python/Common-Gestures-Example/main.py) where the `swipe_screen()` method is defined.
+In this case the `swipe_screen()` method implements the gesture behavior when the callback occurs. The `SwipeScreen` class is added to the screen manager in the usual way. And `swipe_screen()` controls the screen manager as shown in [main.py](https://github.com/Android-for-Python/Common-Gestures-Example/main.py). 
 
 The `GestureCanvas` example illustrates changing objects on a canvas, the `long press move gesture`, and the utility of visual feedback with a long press. See the full example [gesturecanvas.py](https://github.com/Android-for-Python/Common-Gestures-Example/gesturecanvas.py).
 
@@ -36,7 +36,7 @@ Another example is `ZoomImage` an `Image` widget that pans, and zooms from the t
 
 Some Kivy widgets have gestures predefined. You can **replace** the gestures by making a copy of `CommonGestures` and replacing its inheritance from `Widget` with inheritance from the Kivy widget you want to modify. Then implement the calls to that widget's behavior.
 
-The Android Back Gesture is not included in `CommonGestures` as its use is now limited because on Android >= 10 devices it is used to pause an app. However an example usage is shown in [main.py](https://github.com/Android-for-Python/Common-Gestures-Example/main.py). 
+The Android Back Gesture is not included in `CommonGestures` as its use is now limited because on Android >= 10 devices the back gesture is used to pause an app. However an example usage is shown in [main.py](https://github.com/Android-for-Python/Common-Gestures-Example/main.py). 
 
 ## API
 
@@ -132,7 +132,7 @@ As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated wit
 
 Two finger pinch/spread uses the cursor location as focus. Note that the cursor may move significantly during a pinch/spread.
 
-A two finger vertical move is interpretd by a touch pad as a mouse wheel event.
+A two finger vertical move is interpreted by a touch pad as a mouse wheel event.
 
 ### Mac
 
