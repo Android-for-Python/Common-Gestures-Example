@@ -113,7 +113,7 @@ Pinch/spread focus is the mid point between two fingers. The `cg_wheel()` callba
 
 ### Windows
 
-This is required at the top of main.py to disable an undocumented Kivy feature:
+This is required at the top of main.py to disable a Kivy feature:
 ```
 if platform == 'win':
     # Dispose of that nasty red dot on Windows
