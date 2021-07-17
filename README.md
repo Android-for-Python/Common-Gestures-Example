@@ -5,9 +5,9 @@ Common Gestures Example
 
 ## Behavior
 
-The class `CommonGestures` detects the common gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`.
+The class `CommonGestures` detects the common Android gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`.
 
-Designed for use on Android, the gestures can be used on any Kivy supported platform and input device.
+Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices, not a complete set of native gestures for each platform.
 
 These gestures can be **added** to Kivy widgets by subclassing a Kivy Widget and `CommonGestures`, and then including the methods for the required gestures. For a minimal example see `SwipeScreen` below.
 
