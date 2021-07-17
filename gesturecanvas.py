@@ -41,10 +41,14 @@ class GestureCanvas(CommonGestures):
         if self.inside_box(x,y):
             box_edge = self.box_edge
             if box_edge * scale >=  Metrics.dpi / 2:
-                self.box_edge *= scale
-                self.box_x = self.box_x + (box_edge - self.box_edge)/2
-                self.box_y = self.box_y + (box_edge - self.box_edge)/2
-                self.draw_box(x,y)    
+                new_box_edge = self.box_edge * scale
+                new_box_x = self.box_x + (box_edge - new_box_edge)/2
+                new_box_y = self.box_y + (box_edge - new_box_edge)/2
+                if self.box_inside_widget(new_box_x,new_box_y,new_box_edge):
+                    self.box_x = new_box_x
+                    self.box_y = new_box_y
+                    self.box_edge = new_box_edge
+                    self.draw_box(x,y)
 
     def visual_feedback(self,yes, x, y):
         self.can_drag = yes
@@ -53,22 +57,37 @@ class GestureCanvas(CommonGestures):
     def start(self, x, y):
         if self.inside_box(x,y):
             # save where in the box we touched
-            self.drag_offset_x = x - self.box_x
-            self.drag_offset_y = y - self.box_y
+            self.drag_offset_x = self.x + x - self.box_x
+            self.drag_offset_y = self.y + y - self.box_y
 
     def move_box(self, x, y):
         if self.can_drag:
-            self.box_x = x + self.x - self.drag_offset_x
-            self.box_y = y + self.y - self.drag_offset_x
-            self.draw_box(x,y)
-            
+            new_box_x = x + self.x - self.drag_offset_x
+            new_box_y = y + self.y - self.drag_offset_y  
+            if self.box_inside_widget(new_box_x,new_box_y,self.box_edge):
+                self.box_x = new_box_x
+                self.box_y = new_box_y
+                self.draw_box(x,y)
+            else:
+                # the box doesn't move but the cursor does
+                self.drag_offset_x = self.x + x - self.box_x
+                self.drag_offset_y = self.y + y - self.box_y
+
     ############ Utilities
 
     def inside_box(self,x,y):
         x += self.x # convert to canvas coordinates
-        y += self.y 
-        if x > self.box_x  and x < self.box_x + self.box_edge and\
-           y > self.box_y  and y < self.box_y + self.box_edge:
+        y += self.y
+        if x >= self.box_x  and x <= self.box_x + self.box_edge and\
+           y >= self.box_y  and y <= self.box_y + self.box_edge:
+            return True
+        return False
+
+    def box_inside_widget(self, box_x,box_y,box_edge):
+        if box_x >= self.x and\
+           box_y >= self.y and\
+           box_x + box_edge <= self.x + self.width and\
+           box_y + box_edge <= self.y + self.height:
             return True
         return False
 
@@ -80,22 +99,18 @@ class GestureCanvas(CommonGestures):
         self.draw_box(0,0)
         
     def draw_box(self, x, y):
-        if self.box_x >= self.x and\
-           self.box_y >= self.y and\
-           self.box_x + self.box_edge <= self.x + self.width and\
-           self.box_y + self.box_edge <= self.y + self.height:
-            mobile = platform == 'android' or platform == 'ios'
-            self.canvas.clear()
-            with self.canvas:
-                Color(1,1,1) # white
-                Rectangle(pos = self.pos, size= self.size)
-                if self.can_drag and not mobile:
-                    Color(0,0,1) # blue
-                else:
-                    Color(1,0,0) # red
-                Rectangle(pos = (self.box_x, self.box_y),
-                          size= (self.box_edge, self.box_edge))
-                if self.can_drag and mobile:
-                    Color(0,0,1) # blue
-                    Line(circle=(self.x + x, self.y + y, Metrics.dpi / 3),
-                         width = 4)
+        mobile = platform == 'android' or platform == 'ios'
+        self.canvas.clear()
+        with self.canvas:
+            Color(1,1,1) # white
+            Rectangle(pos = self.pos, size= self.size)
+            if self.can_drag and not mobile:
+                Color(0,0,1) # blue
+            else:
+                Color(1,0,0) # red
+            Rectangle(pos = (self.box_x, self.box_y),
+                      size= (self.box_edge, self.box_edge))
+            if self.can_drag and mobile:
+                Color(0,0,1) # blue
+                Line(circle=(self.x + x, self.y + y, Metrics.dpi / 3),
+                     width = 4)
