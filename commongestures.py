@@ -150,13 +150,6 @@ class CommonGestures(Widget):
                 else:
                     self._remove_gesture(touch)
 
-            elif self._gesture_state == 'Swipe':
-                if self.touch_horizontal(touch):
-                    self.cg_swipe_horizontal(touch, touch.x-touch.ox > 0)
-                else:
-                    self.cg_swipe_vertical(touch, touch.y-touch.oy > 0)
-                self._new_gesture()
-
             elif self._gesture_state == 'Scale':
                 # Kivy Windows (and maybe others) sometimes inserts a
                 # bogus event
@@ -223,6 +216,11 @@ class CommonGestures(Widget):
             self.cg_move_to(touch, x, y, self._velocity)
             self.cg_move_end(touch, x, y)
             self._gesture_state = 'Swipe'
+            if self.touch_horizontal(touch):
+                self.cg_swipe_horizontal(touch, touch.x-touch.ox > 0)
+            else:
+                self.cg_swipe_vertical(touch, touch.y-touch.oy > 0)
+
 
     def _not_swipe(self):
         if self._swipe_schedule:
