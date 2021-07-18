@@ -184,12 +184,17 @@ class Screen5(SwipeScreen):
                 COLS = 40
                 
         text='LAST SCREEN.\n\n' +\
-            fill('Zoom in using a spread gesture.',COLS) + '\n'+\
-            fill('Zoom out using a pinch gesture.',COLS) + '\n'+\
+            fill('Zoom in using a spread gesture.Zoom out using a pinch ' +\
+                 'gesture.',COLS) + '\n'+\
             fill('Pan using a move gesture.',COLS) +\
             '\n' +\
             fill('Double Tap to fully Zoom out.',COLS) + '\n' +\
             fill('Swipe right to see the previous screen.',COLS)
+        if not mobile:
+            text += '\n' +\
+                fill('Mouse users use "ctrl-scroll wheel" to zoom, ' +\
+                     '"shift-scroll wheel" to pan horizontally, and ' +\
+                     '"scroll-wheel" to pan vertically',COLS)
         self.label.text = text
 
         

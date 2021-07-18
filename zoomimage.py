@@ -50,6 +50,16 @@ class ZoomImage(Image, CommonGestures):
     def cg_move_to(self, touch, x, y, velocity):
         self._zi_transform(x,y,1)
         
+    def cg_wheel(self, touch, scale, x, y):
+        # let mouse users pan vertically with the wheel
+        self._zi_set_origin(x, y)
+        self._zi_transform(x, y*scale, 1)
+
+    def cg_shift_wheel(self, touch, scale, x, y):
+        # let mouse users pan horizontally with the wheel
+        self._zi_set_origin(x, y)
+        self._zi_transform(x*scale, y, 1)
+
     # Reset
     def cg_double_tap(self, touch, x, y):
         self._zi_init()
