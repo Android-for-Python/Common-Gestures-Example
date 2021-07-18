@@ -7,7 +7,7 @@ Common Gestures Example
 
 The class `CommonGestures` detects the common Android gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`.
 
-Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices, not a complete set of native gestures for each platform.
+Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices, not native gestures for each platform.
 
 These gestures can be **added** to Kivy widgets by subclassing a Kivy Widget and `CommonGestures`, and then including the methods for the required gestures. For a minimal example see `SwipeScreen` below.
 
@@ -107,7 +107,7 @@ The Android Back Gesture is not included in `CommonGestures` as its use is now l
 
 ## Hardware Considerations
 
-### Android and iOS
+### Android
 
 Pinch/spread focus is the mid point between two fingers. The `cg_wheel()` callback is not generated.
 
@@ -120,13 +120,13 @@ if platform == 'win':
     Config.set('input', 'mouse', 'mouse, disable_multitouch')
 ```
 
-### Mouse
+#### Mouse
 
 As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated with press the left mouse button, and end when the press ends.
 
 Mouse wheel movement generates a `cg_wheel()` callback.
 
-### Touch Pad
+#### Touch Pad
 
 As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated with **'one and a half taps'**, or a press on the bottom left corner of the trackpad. 
 
@@ -136,5 +136,20 @@ A two finger vertical move is interpreted by a touch pad as a mouse wheel event.
 
 ### Mac
 
-idk
+Two finger pinch/spread is not available.
+
+Two finger sideways move (meaning swipe on a Mac) is not available.
+
+Force Click (deep press) is reported as a long press, this is a happy coincidence and not by design.
+
+### iOS
+?
+
+### Linux
+?
+
+### Rasberry
+?
+
+
 
