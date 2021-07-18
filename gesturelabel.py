@@ -48,6 +48,15 @@ class GestureLabel(Label, CommonGestures):
         else:
             self.text += 'down'
 
+    def cg_wheel(self, touch, scale, x, y):
+        self.text = 'mouse wheel vertical scroll'
+
+    def cg_ctrl_wheel(self, touch, scale, x, y):
+        self.text = 'mouse wheel zoom'
+
+    def cg_shift_wheel(self, touch, scale, x, y):
+        self.text = 'mouse wheel horizontal scroll'
+
     # Hide the notice of the move of zero pixels pre-empted by swipe
     def cg_move_start(self, touch, x, y):
         self._save = self.text

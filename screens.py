@@ -79,10 +79,11 @@ class Screen2(SwipeScreen):
                  'screen, because of the SwipeScreen class.',COLS) + '\n\n' +\
             fill('The coordinates are widget coordinates.',COLS) 
         if not mobile:
-            text += '\n\n' +\
-                fill('Touch pad users: like the "horizontal swipe", the ' +\
+            text += '\n' +\
+                fill('Touch pad: like the "horizontal swipe", the ' +\
                      '"long press", "long press move", and "move" begin ' +\
-                     'with a tap and a half.',COLS)
+                     'with a tap and a half. Mouse wheel: try "wheel", ' +\
+                     '"ctrl-wheel", and "shift-wheel".',COLS)
         self.label.text = text
 
 
@@ -152,7 +153,7 @@ class Screen4(SwipeScreen):
             text += '\n' +\
                 fill('Touch pad and mouse users, place the cursor on the ' +\
                      'box.',COLS) + '\n' +\
-                fill('Mouse users use the scroll wheel to zoom.',COLS)
+                fill('Mouse users use "ctrl-scroll wheel" to zoom.',COLS)
         self.label.text = text
 
 

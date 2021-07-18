@@ -31,7 +31,7 @@ class GestureCanvas(CommonGestures):
     def cg_scale(self, touch0, touch1, scale, x, y):
         self.zoom_box(scale, x , y)
 
-    def cg_wheel(self, touch, scale, x, y):
+    def cg_ctrl_wheel(self, touch, scale, x, y):
         # let mouse users zoom with the wheel
         self.zoom_box(scale, x , y)
 

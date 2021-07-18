@@ -5,9 +5,11 @@ Common Gestures Example
 
 ## Behavior
 
-The class `CommonGestures` detects the common Android gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`.
+The class `CommonGestures` detects the common Android gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`. 
 
 Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices, not native gestures for each platform.
+
+In addition, for platforms with a mouse scroll wheel the usual conventions are detected: `scroll wheel` can be used for vertical scroll, `shift-scroll wheel` can be used for horizontal scroll, and `ctrl-scroll wheel` can be used for zoom. Also on some touch pads, a vertical two finger movement emulates a mouse scroll wheel.
 
 These gestures can be **added** to Kivy widgets by subclassing a Kivy Widget and `CommonGestures`, and then including the methods for the required gestures. For a minimal example see `SwipeScreen` below.
 
@@ -100,9 +102,20 @@ The Android Back Gesture is not included in `CommonGestures` as its use is now l
     def cg_scale_end(self, touch0, touch1):
         pass
 
-    ############# mouse wheel or touch pad two finger move
+    ############# Mouse Wheel, or Windows touch pad two finger vertical move
+    
+    ############# a common shortcut for scroll
     def cg_wheel(self, touch, scale, x, y):
         pass
+
+    ############# a common shortcut for pinch/spread
+    def cg_ctrl_wheel(self, touch, scale, x, y):
+        pass
+
+    ############# a common shortcut for horizontal scroll
+    def cg_shift_wheel(self, touch, scale, x, y):
+        pass
+	
 ```
 
 ## Hardware Considerations

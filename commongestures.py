@@ -33,6 +33,13 @@ class CommonGestures(Widget):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        mobile = platform == 'android' or platform == 'ios'
+        if not mobile:
+            Window.bind(on_key_down=self._ctrl_key_down)
+            Window.bind(on_key_down=self._shift_key_down)
+            Window.bind(on_key_up=self._key_up)
+        self._CTRL = False
+        self._SHIFT = False
         self._new_gesture()
         #### Sensitivity
         self._DOUBLE_TAP_TIME     = Config.getint('postproc',
@@ -59,7 +66,12 @@ class CommonGestures(Widget):
                 if touch.button == 'scrollup':
                     scale = 1/scale
                 x, y = self._touch_to_widget(touch)
-                self.cg_wheel(touch,scale, x, y)
+                if self._CTRL:
+                    self.cg_ctrl_wheel(touch,scale, x, y)
+                elif self._SHIFT:
+                    self.cg_shift_wheel(touch,scale, x, y)
+                else:
+                    self.cg_wheel(touch,scale, x, y)
 
             elif len(self._touches) == 1:
                 self._gesture_state = 'Dont Know' 
@@ -305,6 +317,18 @@ class CommonGestures(Widget):
         self._finger_distance = 0
         self._velocity = 0
 
+    ### CTRL SHIFT key detect
+    def _ctrl_key_down(self, a, b, c, d, modifiers):
+        if 'ctrl' in modifiers:
+            self._CTRL = True
+
+    def _shift_key_down(self, a, b, c, d, modifiers):
+        if 'shift' in modifiers:
+            self._SHIFT = True
+        
+    def _key_up(self, *args):
+        self._CTRL = False
+        self._SHIFT = False
 
     ############################################
     # User Events
@@ -366,6 +390,16 @@ class CommonGestures(Widget):
     def cg_scale_end(self, touch0, touch1):
         pass
 
-    ############# mouse wheel or touch pad two finger vertical move
+    ############# Mouse Wheel, or Windows touch pad two finger vertical move
+    
+    ############# a common shortcut for scroll
     def cg_wheel(self, touch, scale, x, y):
+        pass
+
+    ############# a common shortcut for pinch/spread
+    def cg_ctrl_wheel(self, touch, scale, x, y):
+        pass
+
+    ############# a common shortcut for horizontal scroll
+    def cg_shift_wheel(self, touch, scale, x, y):
         pass
