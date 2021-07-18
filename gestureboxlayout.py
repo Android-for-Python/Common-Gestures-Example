@@ -60,13 +60,25 @@ class GestureBoxLayout(CommonGestures, BoxLayout):
             self.label0.text += 'down'
 
     def cg_wheel(self, touch, scale, x, y):
-        self.label0.text = 'mouse wheel vertical scroll'
+        self.label0.text = 'Scroll '
+        if scale < 1:
+            self.label0.text += 'up'
+        else:
+            self.label0.text += 'down'
 
     def cg_ctrl_wheel(self, touch, scale, x, y):
-        self.label0.text = 'mouse wheel zoom'
+        self.label0.text = 'Mouse wheel zoom '
+        if scale < 1:
+            self.label0.text += 'out'
+        else:
+            self.label0.text += 'in'
 
     def cg_shift_wheel(self, touch, scale, x, y):
-        self.label0.text = 'mouse wheel horizontal scroll'
+        self.label0.text = 'Scroll '
+        if scale < 1:
+            self.label0.text += 'left'
+        else:
+            self.label0.text += 'right'
 
     # Hide the notice of the move of zero pixels pre-empted by swipe
     def cg_move_start(self, touch, x, y):

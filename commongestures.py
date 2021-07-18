@@ -48,7 +48,7 @@ class CommonGestures(Widget):
                                                   'double_tap_distance')
         self._LONG_PRESS          = 0.4                 # sec, convention
         self._MOVE_VELOCITY_SAMPLE = 0.2                # sec
-        self._SWIPE_TIME          = 0.1                 # sec 
+        self._SWIPE_TIME          = 2/30                # sec 
         self._SWIPE_VELOCITY      = 10                  # inches/sec, heuristic
         self._WHEEL_SENSITIVITY   = 1.1                 # heuristic
 
@@ -63,15 +63,20 @@ class CommonGestures(Widget):
             if touch.is_mouse_scrolling:
                 self._gesture_state = 'Wheel'
                 scale = self._WHEEL_SENSITIVITY
-                if touch.button == 'scrollup':
-                    scale = 1/scale
                 x, y = self._touch_to_widget(touch)
-                if self._CTRL:
-                    self.cg_ctrl_wheel(touch,scale, x, y)
-                elif self._SHIFT:
+                if touch.button == 'scrollleft':
+                    self.cg_shift_wheel(touch,1/scale, x, y)
+                elif touch.button == 'scrollright':
                     self.cg_shift_wheel(touch,scale, x, y)
-                else:
-                    self.cg_wheel(touch,scale, x, y)
+                else: 
+                    if touch.button == 'scrollup':
+                        scale = 1/scale
+                    if self._CTRL:
+                        self.cg_ctrl_wheel(touch,scale, x, y)
+                    elif self._SHIFT:
+                        self.cg_shift_wheel(touch,scale, x, y)
+                    else:
+                        self.cg_wheel(touch,scale, x, y)
 
             elif len(self._touches) == 1:
                 self._gesture_state = 'Dont Know' 
