@@ -79,17 +79,22 @@ class CommonGestures(Widget):
                         self.cg_wheel(touch,scale, x, y)
 
             elif len(self._touches) == 1:
-                self._gesture_state = 'Dont Know' 
-                # schedule a posssible long press
-                self._long_press_schedule =\
-                    Clock.schedule_once(partial(self._long_press_event, touch),
-                                        self._LONG_PRESS)
-                # schedule a posssible tap 
-                if not self._single_tap_schedule:
-                    self._single_tap_schedule =\
-                        Clock.schedule_once(partial(self._single_tap_event,
+                if 'button' in touch.profile and touch.button == 'right':
+                    # Two finger tap or right click
+                    self._gesture_state = 'Right' 
+                else:
+                    self._gesture_state = 'Dont Know' 
+                    # schedule a posssible long press
+                    self._long_press_schedule =\
+                        Clock.schedule_once(partial(self._long_press_event,
                                                     touch),
-                                            self._DOUBLE_TAP_TIME)
+                                            self._LONG_PRESS)
+                    # schedule a posssible tap 
+                    if not self._single_tap_schedule:
+                        self._single_tap_schedule =\
+                            Clock.schedule_once(partial(self._single_tap_event,
+                                                        touch),
+                                                self._DOUBLE_TAP_TIME)
             elif len(self._touches) == 2:
                 self._gesture_state = 'Scale'
                 # If two fingers it cant be a long press, swipe or tap
@@ -167,6 +172,9 @@ class CommonGestures(Widget):
                 else:
                     self._remove_gesture(touch)
 
+            elif self._gesture_state == 'Right':
+                self.cg_two_finger_tap(touch, x, y)
+                
             elif self._gesture_state == 'Scale':
                 # Kivy Windows (and maybe others) sometimes inserts a
                 # bogus event
@@ -324,7 +332,8 @@ class CommonGestures(Widget):
 
     ### CTRL SHIFT key detect
     def _ctrl_key_down(self, a, b, c, d, modifiers):
-        if 'ctrl' in modifiers:
+        command_key = platform == 'macosx' and 'meta' in modifiers
+        if 'ctrl' in modifiers or command_key:
             self._CTRL = True
 
     def _shift_key_down(self, a, b, c, d, modifiers):
@@ -342,6 +351,10 @@ class CommonGestures(Widget):
 
     ############# Tap, Double Tap, and Long Press
     def cg_tap(self, touch, x, y):
+        pass
+
+    def cg_two_finger_tap(self, touch, x, y):
+        # also a mouse right click, desktop only
         pass
 
     def cg_double_tap(self, touch, x, y):

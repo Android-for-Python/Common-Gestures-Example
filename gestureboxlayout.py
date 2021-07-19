@@ -30,6 +30,9 @@ class GestureBoxLayout(CommonGestures, BoxLayout):
     def cg_tap(self, touch, x, y):
         self.label0.text = 'tap' + self.location(x,y)
 
+    def cg_two_finger_tap(self, touch, x, y):
+        self.label0.text = 'two finger tap' + self.location(x,y)
+
     def cg_double_tap(self, touch, x, y):
         self.label0.text = 'double tap' + self.location(x,y)
 

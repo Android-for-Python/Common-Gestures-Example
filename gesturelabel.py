@@ -19,6 +19,9 @@ class GestureLabel(Label, CommonGestures):
     def cg_tap(self, touch, x ,y):
         self.text = 'tap ' + self.location(x, y)
 
+    def cg_two_finger_tap(self, touch, x, y):
+        self.text = 'two finger tap ' + self.location(x,y)
+
     def cg_double_tap(self, touch, x, y):
         self.text = 'double tap ' + self.location(x,y)
 
