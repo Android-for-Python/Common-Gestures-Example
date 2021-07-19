@@ -7,9 +7,9 @@ Common Gestures Example
 
 The class `CommonGestures` detects the common Android gestures for `scale`, `move`, `swipe`, `long press move`, `long press`, `tap`, and `double tap`. A `long press move` is initiated with a `long press`. On the desktop the class also detects `mouse wheel` and the touchpad equivalent `two finger move`. 
 
-Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices, not native gestures for each platform.
+Designed for use on Android, the gestures can be used on any Kivy supported platform and input device. To be clear these are Android style gestures that are available across platforms and input devices.
 
-In addition, for platforms with a mouse scroll wheel the usual conventions are detected: `scroll wheel` can be used for vertical scroll, `shift-scroll wheel` can be used for horizontal scroll, and `ctrl-scroll wheel` can be used for zoom. Also on some touch pads, a vertical two finger movement emulates a mouse scroll wheel.
+In addition, for platforms with a mouse scroll wheel the usual conventions are detected: `scroll wheel` can be used for vertical scroll, `shift-scroll wheel` can be used for horizontal scroll, and `ctrl-scroll wheel` can be used for zoom. Also on touch pads, vertical or horizontal two finger movement emulates a mouse scroll wheel. Also a mouse right click, or pad two finger tap is detected.
 
 These gestures can be **added** to Kivy widgets by subclassing a Kivy Widget and `CommonGestures`, and then including the methods for the required gestures. For a minimal example see `SwipeScreen` below.
 
@@ -52,6 +52,10 @@ The Android Back Gesture is not included in `CommonGestures` as its use is now l
 
     ############# Tap and Long Press
     def cg_tap(self, touch, x, y):
+        pass
+
+    def cg_two_finger_tap(self, touch, x, y):
+        # also a mouse right click, desktop only
         pass
 
     def cg_double_tap(self, touch, x, y):
@@ -122,7 +126,7 @@ The Android Back Gesture is not included in `CommonGestures` as its use is now l
 
 ### Android
 
-Pinch/spread focus is the mid point between two fingers. The `cg_wheel()` callback is not generated.
+Pinch/spread focus is the mid point between two fingers. The mouse wheel callbacks are not generated.
 
 ### Windows
 
@@ -132,12 +136,13 @@ if platform == 'win':
     # Dispose of that nasty red dot on Windows
     Config.set('input', 'mouse', 'mouse, disable_multitouch')
 ```
+On some touchpads pinch/spread will not be detected if this feature is not diabled.
 
 #### Mouse
 
-As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated with press the left mouse button, and end when the press ends.
+As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated with press the left mouse button, and end when the press ends. The right mouse button generates a `cg_two_finger_tap()` callback.
 
-Mouse wheel movement generates a `cg_wheel()` callback.
+Mouse wheel movement generates t `cg_wheel()`, `cg_shift_wheel()`, and `cg_ctrl_wheel()` callbacks.
 
 #### Touch Pad
 
@@ -145,24 +150,25 @@ As usual, `Move`, `Long Press Move`, `Swipe`, and `Long Press` are initiated wit
 
 Two finger pinch/spread uses the cursor location as focus. Note that the cursor may move significantly during a pinch/spread.
 
-A two finger vertical move is interpreted by a touch pad as a mouse wheel event.
+A two finger move is interpreted by a touch pad as the equivalent mouse wheel event. A two finger tap generates a `cg_two_finger_tap()` callback.
 
 ### Mac
 
-Two finger pinch/spread is not available.
-
-Two finger sideways move (meaning swipe on a Mac) is not available.
+Two finger pinch/spread is not available. Use `Command` and `vertical scroll`.
 
 Force Click (deep press) is reported as a long press, this is a happy coincidence and not by design.
 
 ### iOS
-?
+Not tested
 
 ### Linux
-?
+Not tested
 
 ### Rasberry
-?
+Not tested
 
 
 
+## Acknowledgement
+
+A big thank you to Elliot for his analysis, constructive suggestions, and testing.
