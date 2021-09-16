@@ -136,7 +136,7 @@ if platform == 'win':
     # Dispose of that nasty red dot on Windows
     Config.set('input', 'mouse', 'mouse, disable_multitouch')
 ```
-On some touchpads pinch/spread will not be detected if this feature is not diabled.
+On some touchpads pinch/spread will not be detected if this feature is not disabled.
 
 #### Mouse
 
