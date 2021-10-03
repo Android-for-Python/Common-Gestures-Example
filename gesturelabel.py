@@ -35,9 +35,15 @@ class GestureLabel(Label, CommonGestures):
         self.text = 'move to ' + self.location(x, y) +\
             '\nvelocity={}'.format(round(velocity))
 
+    def cg_move_end(self, touch, x, y):
+        self.text = 'move end ' + self.location(x, y)
+
     def cg_long_press_move_to(self, touch, x, y, velocity):
         self.text = 'long press move to\n' + self.location(x, y) +\
             '\nvelocity={}'.format(round(velocity))
+
+    def cg_long_press_move_end(self, touch, x, y):
+        self.text = 'long press move end\n' + self.location(x, y) 
 
     def cg_scale(self, touch0, touch1, scale, x, y):
         scale = round(scale * 1000) / 1000
