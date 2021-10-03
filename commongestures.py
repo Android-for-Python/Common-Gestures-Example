@@ -48,8 +48,8 @@ class CommonGestures(Widget):
                                                   'double_tap_distance')
         self._LONG_PRESS          = 0.4                 # sec, convention
         self._MOVE_VELOCITY_SAMPLE = 0.2                # sec
-        self._SWIPE_TIME          = 2/30                # sec 
-        self._SWIPE_VELOCITY      = 10                  # inches/sec, heuristic
+        self._SWIPE_TIME          = 0.2                 # sec 
+        self._SWIPE_VELOCITY      = 5                   # inches/sec, heuristic
         self._WHEEL_SENSITIVITY   = 1.1                 # heuristic
 
     #####################
@@ -61,18 +61,20 @@ class CommonGestures(Widget):
     # The on_touch_* callbacks have the required value because of collide_point
     # but only within the scope of that touch callback.
     #
-    # This is an issue for gestures with persistence, and with two touches
-    # (one of which always depends on persistence)
+    # This is an issue for gestures with persistence, for example two touches.
     # So if we have a RelativeLayout we can't rely on the value in touch.pos .
     # So regardless of there being a RelativeLayout, we save each touch.pos
     # in self._persistent_pos[] and use that when the current value is
-    # required. Some Clock events require the start value, we propagate
-    # this as an argument.
+    # required. 
     
     ### touch down ###
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            self._touches.append(touch)
+            if len(self._touches) == 1 and touch.id == self._touches[0].id:
+                # Filter noise from Kivy
+                pass
+            else:
+                self._touches.append(touch)
             if touch.is_mouse_scrolling:
                 self._gesture_state = 'Wheel'
                 scale = self._WHEEL_SENSITIVITY
@@ -117,7 +119,6 @@ class CommonGestures(Widget):
                 # If two fingers it cant be a long press, swipe or tap
                 self._not_long_press() 
                 self._not_single_tap()
-                self._not_swipe()
                 self._persistent_pos[1] = tuple(touch.pos)
                 x, y = self._scale_midpoint()
                 self.cg_scale_start(self._touches[0],self._touches[1], x, y)
@@ -135,22 +136,22 @@ class CommonGestures(Widget):
                 if self._gesture_state == 'Long Pressed':
                     self._gesture_state = 'Long Press Move'
                     x, y = self._pos_to_widget(*touch.opos)
-                    self._start_velocity_clock(touch)
+                    self._velocity_start(touch)
                     self.cg_long_press_move_start(touch, x, y)
 
                 elif self._gesture_state == 'Dont Know':
-                    # possible pre-empt as swipe
-                    self._persistent_pos[0] = tuple(touch.pos)
-                    self._swipe_schedule =\
-                        Clock.schedule_once(partial(self._possible_swipe,
-                                                    touch, (*touch.opos),
-                                                    time()),
-                                            self._SWIPE_TIME)
-                    # start the move, will be reset if is swipe
-                    self._gesture_state = 'Move' 
+                    self._gesture_state = 'Disambiguate'
                     x, y = self._pos_to_widget(*touch.opos)
-                    self._start_velocity_clock(touch)
+                    self._velocity_start(touch)
                     self.cg_move_start(touch, x, y)
+
+                if self._gesture_state == 'Disambiguate':
+                    if touch.time_update - touch.time_start < self._SWIPE_TIME:
+                        if self._possible_swipe(touch):
+                            # 'Swipe' but may not see a touch_up.
+                            self._new_gesture()
+                    else:
+                        self._gesture_state = 'Move' 
 
                 if self._gesture_state == 'Scale':
                     if len(self._touches) <= 2:
@@ -170,19 +171,18 @@ class CommonGestures(Widget):
                 else: 
                     x, y = self._pos_to_widget(*touch.pos)
                     if self._gesture_state == 'Move':
-                        self._persistent_pos[0] = tuple(touch.pos)
-                        self.cg_move_to(touch, x, y, self._velocity)
+                        self.cg_move_to(touch, x, y, self._velocity_now(touch))
                         
                     elif self._gesture_state == 'Long Press Move':
-                        self.cg_long_press_move_to(touch, x, y, self._velocity)
+                        self.cg_long_press_move_to(touch, x, y,
+                                                   self._velocity_now(touch))
                         
         return super().on_touch_move(touch)                    
 
     ### touch up ###
     def on_touch_up(self, touch):
-        if touch in self._touches and self.collide_point(*touch.pos):
+        if touch in self._touches: # and self.collide_point(*touch.pos):
             self._not_long_press()
-            self._not_swipe()
             x, y = self._pos_to_widget(*touch.pos)
 
             if self._gesture_state == 'Dont Know':
@@ -204,12 +204,10 @@ class CommonGestures(Widget):
                     self._new_gesture()
 
             elif self._gesture_state == 'Long Press Move':
-                self._stop_velocity_clock()
                 self.cg_long_press_move_end(touch, x, y)
                 self._new_gesture()
 
             elif self._gesture_state == 'Move':
-                self._stop_velocity_clock()
                 self.cg_move_end(touch, x, y)
                 self._new_gesture()
 
@@ -230,6 +228,7 @@ class CommonGestures(Widget):
 
     ### long press clock ###
     def _long_press_event(self, touch, x, y, ox, oy, dt):
+        self._long_press_schedule = None
         distance_squared = (x -ox)**2 + (y -oy)**2
         if distance_squared < self._DOUBLE_TAP_DISTANCE **2:
             x, y = self._pos_to_widget(x, y)
@@ -254,63 +253,43 @@ class CommonGestures(Widget):
             Clock.unschedule(self._single_tap_schedule)
             self._single_tap_schedule = None
 
-    ### swipe clock ###
-    def _possible_swipe(self, touch, ox, oy, start_time, dt):
-        self._not_swipe()
-        x, y = self._persistent_pos[0]
-        if self._has_swipe_velocity(x, y, ox, oy, start_time):
-            # A Swipe pre-empts a Move, so reset the Move
-            wox, woy = self._pos_to_widget(ox, oy)
-            self.cg_move_to(touch, wox, woy, self._velocity)
-            self.cg_move_end(touch, wox, woy)
-            self._gesture_state = 'Swipe'
-            if self.touch_horizontal(touch):
-                self.cg_swipe_horizontal(touch, x-ox > 0)
-            else:
-                self.cg_swipe_vertical(touch, y-oy > 0)
-
-
-    def _not_swipe(self):
-        if self._swipe_schedule:
-            Clock.unschedule(self._swipe_schedule)
-            self._swipe_schedule = None
-
-    def _has_swipe_velocity(self, x, y, ox, oy, start_time):
-        period = time() - start_time
+    def _possible_swipe(self, touch):
+        x, y = touch.pos 
+        ox, oy = touch.opos
+        period = touch.time_update - touch.time_start
         distance = sqrt((x-ox)**2 + (y-oy)**2)
         if period:
             velocity = distance / (period * Metrics.dpi)
         else:
             velocity = 0
-        return velocity > self._SWIPE_VELOCITY
 
-    ### velocity clock, for move operations ###
-    def _start_velocity_clock(self,touch):
-        self._velocity_time = time()
-        self._velocity_x, self._velocity_y = self._persistent_pos[0]
-        self._velocity_schedule =\
-            Clock.schedule_interval(partial(self._velocity_clock, touch),
-                                    self._MOVE_VELOCITY_SAMPLE)
-                    
-    def _velocity_clock(self, touch, dt):
-        now = time()
-        period = now - self._velocity_time
-        x, y = self._persistent_pos[0]
-        distance = sqrt((x - self._velocity_x)**2 +\
-                        (y - self._velocity_y)**2)
+        if velocity > self._SWIPE_VELOCITY:
+            # A Swipe pre-empts a Move, so reset the Move
+            wox, woy = self._pos_to_widget(ox, oy)
+            self.cg_move_to(touch, wox, woy, self._velocity)
+            self.cg_move_end(touch, wox, woy)
+            if self.touch_horizontal(touch):
+                self.cg_swipe_horizontal(touch, x-ox > 0)
+            else:
+                self.cg_swipe_vertical(touch, y-oy > 0)
+            return True
+        return False
+
+    def _velocity_start(self, touch):
+        self._velx , self._vely = touch.opos
+        self._velt = touch.time_start
+        
+    def _velocity_now(self, touch):
+        period = touch.time_update - self._velt
+        x, y = touch.pos
+        distance = sqrt((x - self._velx)**2 + (y - self._vely)**2)
+        self._velt = touch.time_update
+        self._velx , self._vely = touch.pos
         if period:
-            self._velocity = distance / (period * Metrics.dpi) 
+            return distance / (period * Metrics.dpi) 
         else:
-            self._velocity = 0
-        self._velocity_time = now
-        self._velocity_x = x
-        self._velocity_y = y
-
-    def _stop_velocity_clock(self):
-        if self._velocity_schedule:
-            Clock.unschedule(self._velocity_schedule)
-            self._velocity_schedule = None
-
+            return 0
+        
     ### touch direction ###
     # direction is the same with or without RelativeLayout
 
@@ -354,7 +333,6 @@ class CommonGestures(Widget):
         self._long_press_schedule = None
         self._single_tap_schedule = None
         self._velocity_schedule = None
-        self._swipe_schedule = None
         self._gesture_state = 'None'
         self._finger_distance = 0
         self._velocity = 0
