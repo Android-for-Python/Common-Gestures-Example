@@ -48,7 +48,7 @@ class CommonGestures(Widget):
                                                   'double_tap_distance')
         self._LONG_PRESS          = 0.4                 # sec, convention
         self._MOVE_VELOCITY_SAMPLE = 0.2                # sec
-        self._SWIPE_TIME          = 0.2                 # sec 
+        self._SWIPE_TIME          = 0.3                 # sec 
         self._SWIPE_VELOCITY      = 5                   # inches/sec, heuristic
         self._WHEEL_SENSITIVITY   = 1.1                 # heuristic
 
@@ -69,7 +69,7 @@ class CommonGestures(Widget):
     
     ### touch down ###
     def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
+        if self.collide_point(touch.x, touch.y):
             if len(self._touches) == 1 and touch.id == self._touches[0].id:
                 # Filter noise from Kivy
                 pass
@@ -78,7 +78,7 @@ class CommonGestures(Widget):
             if touch.is_mouse_scrolling:
                 self._gesture_state = 'Wheel'
                 scale = self._WHEEL_SENSITIVITY
-                x, y = self._pos_to_widget(*touch.pos)
+                x, y = self._pos_to_widget(touch.x, touch.y)
                 if touch.button == 'scrollleft':
                     self.cg_shift_wheel(touch,1/scale, x, y)
                 elif touch.button == 'scrollright':
@@ -102,14 +102,15 @@ class CommonGestures(Widget):
                     # schedule a posssible long press
                     self._long_press_schedule =\
                         Clock.schedule_once(partial(self._long_press_event,
-                                                    touch, (*touch.pos),
-                                                    (*touch.opos)),
+                                                    touch, touch.x, touch.y,
+                                                    touch.ox, touch.oy),
                                             self._LONG_PRESS)
                     # schedule a posssible tap 
                     if not self._single_tap_schedule:
                         self._single_tap_schedule =\
                             Clock.schedule_once(partial(self._single_tap_event,
-                                                        touch ,(*touch.pos)),
+                                                        touch ,
+                                                        touch.x, touch.y),
                                                 self._DOUBLE_TAP_TIME)
 
                 self._persistent_pos = [(0,0),(0,0)]
@@ -127,7 +128,7 @@ class CommonGestures(Widget):
 
     ### touch move ###
     def on_touch_move(self, touch):
-        if touch in self._touches and self.collide_point(*touch.pos):
+        if touch in self._touches and self.collide_point(touch.x, touch.y):
             if touch.dx or touch.dy:
                 # If moving it cant be a pending long press or tap
                 self._not_long_press()
@@ -135,13 +136,13 @@ class CommonGestures(Widget):
                 # State changes
                 if self._gesture_state == 'Long Pressed':
                     self._gesture_state = 'Long Press Move'
-                    x, y = self._pos_to_widget(*touch.opos)
+                    x, y = self._pos_to_widget(touch.ox, touch.oy)
                     self._velocity_start(touch)
                     self.cg_long_press_move_start(touch, x, y)
 
                 elif self._gesture_state == 'Dont Know':
                     self._gesture_state = 'Disambiguate'
-                    x, y = self._pos_to_widget(*touch.opos)
+                    x, y = self._pos_to_widget(touch.ox, touch.oy)
                     self._velocity_start(touch)
                     self.cg_move_start(touch, x, y)
 
@@ -169,7 +170,7 @@ class CommonGestures(Widget):
                         self._finger_distance = finger_distance
 
                 else: 
-                    x, y = self._pos_to_widget(*touch.pos)
+                    x, y = self._pos_to_widget(touch.x, touch.y)
                     if self._gesture_state == 'Move':
                         self.cg_move_to(touch, x, y, self._velocity_now(touch))
                         
@@ -181,9 +182,9 @@ class CommonGestures(Widget):
 
     ### touch up ###
     def on_touch_up(self, touch):
-        if touch in self._touches: # and self.collide_point(*touch.pos):
+        if touch in self._touches: 
             self._not_long_press()
-            x, y = self._pos_to_widget(*touch.pos)
+            x, y = self._pos_to_widget(touch.x, touch.y)
 
             if self._gesture_state == 'Dont Know':
                 if touch.is_double_tap:
@@ -197,11 +198,8 @@ class CommonGestures(Widget):
                 self.cg_two_finger_tap(touch, x, y)
                 
             elif self._gesture_state == 'Scale':
-                # Kivy Windows (and maybe others) sometimes inserts a
-                # bogus event
-                if len(self._touches) == 2 or len(self._touches) == 3:
-                    self.cg_scale_end(self._touches[0], self._touches[1])
-                    self._new_gesture()
+                self.cg_scale_end(self._touches[0], self._touches[1])
+                self._new_gesture()
 
             elif self._gesture_state == 'Long Press Move':
                 self.cg_long_press_move_end(touch, x, y)
