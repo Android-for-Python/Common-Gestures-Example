@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from commongestures import CommonGestures
+from gestures4kivy import CommonGestures
 
 ### A swipe sensitive Screen, parent of all screen layouts
 class SwipeScreen(Screen, CommonGestures):

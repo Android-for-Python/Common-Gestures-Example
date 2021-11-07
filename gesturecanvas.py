@@ -1,7 +1,7 @@
 from kivy.graphics import Color, Rectangle, Line
 from kivy.metrics import Metrics
 from kivy.utils import platform
-from commongestures import CommonGestures
+from gestures4kivy import CommonGestures
 
 ### Move an item on a canvas
 ###################################################

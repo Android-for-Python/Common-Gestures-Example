@@ -1,6 +1,6 @@
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle
-from commongestures import CommonGestures
+from gestures4kivy import CommonGestures
 
 ### A gesture sensitive Label
 ###################################################

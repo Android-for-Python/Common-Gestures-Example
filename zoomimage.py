@@ -1,7 +1,7 @@
 from kivy.uix.image import Image
 from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
-from commongestures import CommonGestures
+from gestures4kivy import CommonGestures
 
 class ZoomImage(Image, CommonGestures):
 
