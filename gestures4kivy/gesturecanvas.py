@@ -47,8 +47,8 @@ class GestureCanvas(CommonGestures):
             box_edge = self.box_edge
             if box_edge * scale >= Metrics.dpi / 2:
                 new_box_edge = self.box_edge * scale
-                new_box_x = self.box_x + (box_edge - new_box_edge)/2
-                new_box_y = self.box_y + (box_edge - new_box_edge)/2
+                new_box_x = self.box_x + (box_edge - new_box_edge) / 2
+                new_box_y = self.box_y + (box_edge - new_box_edge) / 2
                 if self.box_inside_widget(new_box_x, new_box_y, new_box_edge):
                     self.box_x = new_box_x
                     self.box_y = new_box_y
