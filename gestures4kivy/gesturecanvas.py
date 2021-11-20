@@ -85,8 +85,10 @@ class GestureCanvas(CommonGestures):
         y += self.y
 
         if all([
-            x >= self.box_x and x <= self.box_x + self.box_edge,
-            y >= self.box_y and y <= self.box_y + self.box_edge
+            x >= self.box_x,
+            x <= self.box_x + self.box_edge,
+            y >= self.box_y,
+            y <= self.box_y + self.box_edge
         ]):
             return True
 
