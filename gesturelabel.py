@@ -7,6 +7,10 @@ from gestures4kivy import CommonGestures
 
 class GestureLabel(Label, CommonGestures):
 
+    def __init__(self, **args):
+        super().__init__( **args)
+        self._save = ''
+        
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:

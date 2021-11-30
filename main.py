@@ -4,13 +4,14 @@ from kivy.utils import platform
 from kivy.core.window import Window
 from screens import Screen1, Screen2, Screen3, Screen4, Screen5
 
-if platform == 'win':
-    # Dispose of that nasty red dot on Windows
+if platform != 'android':
+    # Dispose of that nasty red dot
     from kivy.config import Config 
     Config.set('input', 'mouse', 'mouse, disable_multitouch')
 
 class MyApp(App):
     def build(self):
+        self.touch_time = 0
         if platform == 'android':
             Window.bind(on_keyboard = self.inhibit_android_back_gesture)
         self.sm = ScreenManager()
@@ -24,14 +25,17 @@ class MyApp(App):
         return self.sm
 
     # assumes screen names '1','2','3'....
-    def swipe_screen(self, right):
-        i = int(self.sm.current)
-        if right:
-            self.sm.transition.direction = 'right'
-            self.sm.current = str(max(1,i-1))
-        else:
-            self.sm.transition.direction = 'left'
-            self.sm.current = str(min(len(self.screens),i+1))
+    def swipe_screen(self, right, time):
+        # filter bogus events
+        if time > self.touch_time + 0.8:
+            i = int(self.sm.current)
+            if right:
+                self.sm.transition.direction = 'right'
+                self.sm.current = str(max(1,i-1))
+            else:
+                self.sm.transition.direction = 'left'
+                self.sm.current = str(min(len(self.screens),i+1))
+        self.touch_time = time
 
     # As a 'Android back gesture/button' example:
     # Inhibit the OS's 'back gesture/button' except on the app's home screen.

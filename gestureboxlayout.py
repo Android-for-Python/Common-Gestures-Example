@@ -16,6 +16,7 @@ class GestureBoxLayout(CommonGestures, BoxLayout):
         self.label1 = Label()
         self.add_widget(self.label0)
         self.add_widget(self.label1)
+        self._save = ''
     
     def on_size(self, *args):
         self.canvas.before.clear()
