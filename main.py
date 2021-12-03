@@ -26,8 +26,8 @@ class MyApp(App):
 
     # assumes screen names '1','2','3'....
     def swipe_screen(self, right, time):
-        # filter bogus events
-        if time > self.touch_time + 0.8:
+        # filter bogus events https://github.com/kivy/kivy/issues/7707
+        if platform != 'win' or time > self.touch_time + 0.6:
             i = int(self.sm.current)
             if right:
                 self.sm.transition.direction = 'right'
