@@ -6,4 +6,4 @@ from gestures4kivy import CommonGestures
 class SwipeScreen(Screen, CommonGestures):
     def cg_swipe_horizontal(self, touch, right):
         # one finger horizontal swipe
-        App.get_running_app().swipe_screen(right, touch.time_start)
+        App.get_running_app().swipe_screen(right)
