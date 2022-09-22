@@ -1,6 +1,7 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle
+from kivy.utils import platform
 from gestures4kivy import CommonGestures
 
 ### A gesture sensitive BoxLayout
@@ -16,7 +17,6 @@ class GestureBoxLayout(CommonGestures, BoxLayout):
         self.label1 = Label()
         self.add_widget(self.label0)
         self.add_widget(self.label1)
-        self._save = ''
     
     def on_size(self, *args):
         self.canvas.before.clear()
@@ -25,74 +25,42 @@ class GestureBoxLayout(CommonGestures, BoxLayout):
             Rectangle(pos=self.pos, size=self.size)
         self.label1.text = self.text
 
-    def location(self, x, y):
-        return ' x={} y={}'.format(round(x),round(y))
+    def set_label(self, text, x, y):
+        self.label0.text = '{}\nFocus x={} y={}'.format(text,round(x),round(y))
 
-    def cg_tap(self, touch, x, y):
-        self.label0.text = 'tap' + self.location(x,y)
+    def cgb_primary(self, touch, focus_x, focus_y):
+        self.set_label('Primary Event',focus_x, focus_y)
 
-    def cg_two_finger_tap(self, touch, x, y):
-        self.label0.text = 'two finger tap' + self.location(x,y)
+    def cgb_secondary(self, touch, focus_x, focus_y):
+        self.set_label('Secondary Event',focus_x, focus_y)
 
-    def cg_double_tap(self, touch, x, y):
-        self.label0.text = 'double tap' + self.location(x,y)
+    def cgb_select(self, touch, focus_x, focus_y, long_press):
+        self.set_label('Select',focus_x, focus_y)
 
-    def cg_long_press(self, touch, x, y):
-        self.label0.text = 'long press or move\n' + self.location(x, y)
+    def cgb_long_press_end(self, touch, focus_x, focus_y):
+        self.set_label('Long Press End', focus_x, focus_y)
 
-    def cg_long_press_end(self, touch, x, y):
-        self.label0.text = 'long press\n' + self.location(x, y)
+    def cgb_drag(self, touch, focus_x, focus_y, delta_x, delta_y):
+        self.set_label('Drag',focus_x, focus_y)
 
-    def cg_long_press_move_to(self, touch, x, y, velocity):
-        self.label0.text = 'long press move to\n' + self.location(x,y) +\
-            '\nvelocity={}'.format(round(velocity))
+    def cgb_scroll(self, touch, focus_x, focus_y, delta_y, velocity):
+        self.set_label('Scroll',focus_x, focus_y)
+        self.label0.text += '\ndelta y={}'.format(round(delta_y))
+        self.label0.text += '\nvelocity={}'.format(round(velocity))
 
-    def cg_long_press_move_end(self, touch, x, y):
-        self.label0.text = 'long press move to\n' + self.location(x,y)
+    def cgb_zoom(self, touch0, touch1, focus_x, focus_y, delta_scale):
+        self.set_label('Zoom',focus_x, focus_y)
+        fmt = round(delta_scale * 1000)/1000
+        self.label0.text += '\ndelta scale={}'.format(fmt)
 
-    def cg_move_to(self, touch, x, y, velocity):
-        self.label0.text = 'move to' + self.location(x,y) +\
-            '\nvelocity={}'.format(round(velocity))
-
-    def cg_move_end(self, touch, x, y):
-        self.label0.text = 'move end' + self.location(x,y) 
-
-    def cg_scale(self, touch0, touch1, scale, x, y):
-        scale = round(scale * 1000) / 1000
-        self.label0.text = 'scale = {} centered\nat x={} y={}'.format(scale,
-                                                                      round(x),
-                                                                      round(y))
-    def cg_swipe_vertical(self, touch, bottom_to_top):
-        self.label0.text = 'swipe '
-        if bottom_to_top:
-            self.label0.text += 'up'
+    def cgb_rotate(self, touch0, touch1, focus_x, focus_y, delta_angle):
+        if platform in ['android', 'ios']:
+            self.label0.text += '{}\nFocus x={} y={}'.format('\n\nRotate',
+                                                             round(focus_x),
+                                                             round(focus_y))
         else:
-            self.label0.text += 'down'
+            self.set_label('Rotate',focus_x, focus_y)
+        fmt = round(delta_angle * 1000)/1000
+        self.label0.text += '\ndelta angle={}'.format(fmt)
 
-    def cg_wheel(self, touch, scale, x, y):
-        self.label0.text = 'Scroll '
-        if scale < 1:
-            self.label0.text += 'up'
-        else:
-            self.label0.text += 'down'
-
-    def cg_ctrl_wheel(self, touch, scale, x, y):
-        self.label0.text = 'Mouse wheel zoom '
-        if scale < 1:
-            self.label0.text += 'out'
-        else:
-            self.label0.text += 'in'
-
-    def cg_shift_wheel(self, touch, scale, x, y):
-        self.label0.text = 'Scroll '
-        if scale < 1:
-            self.label0.text += 'left'
-        else:
-            self.label0.text += 'right'
-
-    # Hide the notice of the move of zero pixels pre-empted by swipe
-    def cg_move_start(self, touch, x, y):
-        self._save = self.label0.text
-
-    def cg_swipe_horizontal(self, touch, left_to_right):
-        self.label0.text = self._save
+        

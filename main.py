@@ -4,7 +4,7 @@ from kivy.utils import platform
 from kivy.core.window import Window
 from screens import Screen1, Screen2, Screen3, Screen4, Screen5
 
-if platform != 'android':
+if platform not in ['android', 'ios']:
     # Dispose of that nasty red dot
     from kivy.config import Config 
     Config.set('input', 'mouse', 'mouse, disable_multitouch')

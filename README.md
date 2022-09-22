@@ -19,7 +19,7 @@ The first screen demonstrates a Screen that responds to a swipe. To implement we
 ### A swipe sensitive Screen
 class SwipeScreen(Screen, CommonGestures):
 
-    def cg_swipe_horizontal(self, touch, right):
+    def cgb_horizontal_page(self, touch, right):
         # here we add the user defined behavior for the gesture
 	# this method controls the ScreenManager in response to a swipe
         App.get_running_app().swipe_screen(right)

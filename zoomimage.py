@@ -31,39 +31,21 @@ class ZoomImage(Image, CommonGestures):
     # Gestures recognized
     ################################################
 
-    # Zoom
-    def cg_scale_start(self, touch0, touch1, x, y):
-        self._zi_set_origin(x, y)
+    def cgb_scroll(self, touch, focus_x, focus_y, delta_y, velocity):
+        self._zi_set_origin(focus_x, focus_y)
+        self._zi_transform(focus_x , focus_y + delta_y, 1)    
 
-    def cg_scale(self, touch0, touch1, scale, x, y):
-        self._zi_transform(x,y,scale)
+    def cgb_pan(self, touch, focus_x, focus_y, delta_x, velocity):
+        self._zi_set_origin(focus_x, focus_y)
+        self._zi_transform(focus_x + delta_x, focus_y, 1)    
 
-    def cg_ctrl_wheel(self, touch, scale, x, y):
-        # let mouse users zoom with the wheel
-        self._zi_set_origin(x, y)
-        self._zi_transform(x,y,scale)
+    def cgb_zoom(self, touch0, touch1, focus_x, focus_y, delta_scale):
+        self._zi_set_origin(focus_x, focus_y)
+        self._zi_transform(focus_x , focus_y, delta_scale)    
 
-    # Pan
-    def cg_move_start(self, touch, x, y):
-        self._zi_set_origin(x, y)
-
-    def cg_move_to(self, touch, x, y, velocity):
-        self._zi_transform(x,y,1)
-        
-    def cg_wheel(self, touch, scale, x, y):
-        # let mouse users pan vertically with the wheel
-        self._zi_set_origin(x, y)
-        self._zi_transform(x, y*scale, 1)
-
-    def cg_shift_wheel(self, touch, scale, x, y):
-        # let mouse users pan horizontally with the wheel
-        self._zi_set_origin(x, y)
-        self._zi_transform(x*scale, y, 1)
-
-    # Reset
-    def cg_double_tap(self, touch, x, y):
+    def cgb_select(self, touch, focus_x, focus_y, long_press):
         self._zi_init()
-
+        
     # Behavior
     ################################################
 

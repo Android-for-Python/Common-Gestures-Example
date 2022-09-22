@@ -71,19 +71,21 @@ class Screen2(SwipeScreen):
 
         text='SECOND SCREEN.\n\n' +\
             fill('The gesture sensitive widget is grey. In the grey area ' +\
-                 'try a "tap", "double tap", "long press", "move", ' +\
-                 '"long press move", "scale gesture" or "vertical swipe". ' +\
-                 'A "long press move" begins with a "long press".', COLS) +\
+                 'try a "primary event", "secondary event", "select", ' +\
+                 '"drag", "scroll", "zoom", or "rotate". ', COLS) +\
                  '\n\n' +\
-            fill('A horizonal swipe anywhere in the screen changes the ' +\
-                 'screen, because of the SwipeScreen class.',COLS) + '\n\n' +\
             fill('The coordinates are widget coordinates.',COLS) 
         if not mobile:
-            text += '\n' +\
-                fill('Touch pad: like the "horizontal swipe", the ' +\
-                     '"long press", "long press move", and "move" begin ' +\
-                     'with a tap and a half. Mouse wheel: try "wheel", ' +\
-                     '"ctrl-wheel", and "shift-wheel".',COLS)
+            if platform == 'macosx':
+                text += '\n\n' +\
+                    fill('MacOS: Zoom is Cmd-scroll, rotate is Option-scroll.',
+                         COLS)
+            else:
+                text += '\n\n' +\
+                    fill('Mouse: Zoom is Ctrl-wheel, rotate is Alt-wheel.',
+                         COLS) + '\n' +\
+                    fill('Touchpad: Rotate is Alt-scroll.',
+                         COLS)
         self.label.text = text
 
 
@@ -141,19 +143,18 @@ class Screen4(SwipeScreen):
             else:
                 COLS = 40
                 
-        text='FOURTH SCREEN.\n\n' +\
-            fill('Use "long press move" and "zoom" to change items on a ' +\
-                 'canvas.',COLS) + '\n\n'+\
-            fill('Long press on the red box, wait for visual feedback ' +\
-                 'then it can be dragged.', COLS) + '\n' +\
-            fill('Visual feedback is helpful with long press.', COLS) +'\n\n' +\
-            fill('Change the size of the box with a pinch/spread gesture ' +\
-                 'centered on the box.',COLS)
+        text='FOURTH SCREEN.\n\n'
         if not mobile:
-            text += '\n' +\
-                fill('Touch pad and mouse users, place the cursor on the ' +\
-                     'box.',COLS) + '\n' +\
-                fill('Mouse users use "ctrl-scroll wheel" to zoom.',COLS)
+            text += (fill('Move the cursor inside the box to ' +\
+                          'drag, zoom, or rotate the box.', COLS) + '\n')
+            text += fill('Mouse users use "Ctrl-scroll wheel" to zoom.',COLS)
+            text += fill('Use "Alt-scroll" to rotate.',COLS)            
+        else:
+            text += fill('Drag, zoom, or rotate the box.', COLS) + '\n'
+            text += fill('To rotate, twist two fingers around the box.',
+                         COLS)
+            text += fill('To drag, long press and wait for the blue ' +\
+                         'circle, then move finger.', COLS)
         self.label.text = text
 
 
@@ -184,17 +185,14 @@ class Screen5(SwipeScreen):
                 COLS = 40
                 
         text='LAST SCREEN.\n\n' +\
-            fill('Zoom in using a spread gesture.Zoom out using a pinch ' +\
-                 'gesture.',COLS) + '\n'+\
-            fill('Pan using a move gesture.',COLS) +\
-            '\n' +\
-            fill('Double Tap to fully Zoom out.',COLS) + '\n' +\
+            fill('Zoom, scroll, and (slowly) pan the image.',COLS) + '\n'+\
+            fill('Double Tap or long press to fully zoom out.',COLS) + '\n' +\
             fill('Swipe right to see the previous screen.',COLS)
         if not mobile:
             text += '\n' +\
                 fill('Mouse users use "ctrl-scroll wheel" to zoom, ' +\
-                     '"shift-scroll wheel" to pan horizontally, and ' +\
-                     '"scroll-wheel" to pan vertically',COLS)
+                     '"shift-scroll wheel" to pan, and ' +\
+                     '"scroll-wheel" to scroll.',COLS)
         self.label.text = text
 
         
