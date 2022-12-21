@@ -37,6 +37,13 @@ class GestureLabel(Label, CommonGestures):
         self.text += '\ndelta y={}'.format(round(delta_y))
         self.text += '\nvelocity={}'.format(round(velocity))
 
+    def cgb_pan(self, touch, focus_x, focus_y, delta_y, velocity):
+        if platform in ['android', 'ios']:
+            # Can disambiguate between swipe and pan
+            self.set_label('Pan',focus_x, focus_y)
+            self.text += '\ndelta y={}'.format(round(delta_y))
+            self.text += '\nvelocity={}'.format(round(velocity))
+
     def cgb_zoom(self, touch0, touch1, focus_x, focus_y, delta_scale):
         self.set_label('Zoom',focus_x, focus_y)
         fmt = round(delta_scale * 1000)/1000
