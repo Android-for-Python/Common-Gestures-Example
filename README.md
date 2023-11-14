@@ -3,6 +3,8 @@ Common Gestures Example
 
 *An example of using gestures4kivy*
 
+**2023-11-13 This repository is archived.**
+
 [**Other Examples**](https://github.com/Android-for-Python/INDEX-of-Examples)
 
 ## Dependencies 
